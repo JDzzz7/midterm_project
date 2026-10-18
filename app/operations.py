@@ -62,3 +62,24 @@ class Modulus(Operation):
             raise ValueError("Modulus by zero cannot be calculated")
         return a % b
 
+
+class IntegerDivision(Operation):
+    """Implementation of integer division operation."""
+    def execute(self, a, b):
+        if b == 0:
+            raise ValueError("Integer division by zero cannot be calculated")
+        return a // b
+
+
+class Percentage(Operation):
+    """Implementation of percentage operation."""
+    def execute(self, a, b):
+        if b == 0:
+            raise ValueError("Percentage denominator cannot be zero")
+        return (a / b) * 100
+
+
+class AbsoluteDifference(Operation):
+    """Implementation of absolute difference operation."""
+    def execute(self, a, b):
+        return abs(a - b)
