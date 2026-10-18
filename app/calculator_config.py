@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from app.exceptions import ConfigurationError
 
 load_dotenv()
 
@@ -14,10 +15,6 @@ class CalculatorConfig:
         self.auto_save = os.getenv(
             "CALCULATOR_AUTO_SAVE", "true"
         ).lower() in ("true", "1")
-
-        self.history_dir = self.base_dir / "history"
-        self.history_file = self.history_dir / "calculator_history.csv"
-
 
         """Set the maximum history size environment variables."""
         self.max_history_size = int(
@@ -55,7 +52,43 @@ class CalculatorConfig:
             )
         ).resolve()
 
+    @property
+    def history_dir(self):
+        """Return the directory where calculation history is stored."""
+        return Path(
+            os.getenv(
+                "CALCULATOR_HISTORY_DIR",
+                str(self.base_dir / "history")
+            )
+        ).resolve()
 
+    @property
+    def history_file(self):
+        """Return the path to the CSV file that stores calculation history."""
+        return Path(
+            os.getenv(
+                "CALCULATOR_HISTORY_FILE",
+                str(self.history_dir / "calculator_history.csv")
+            )
+        ).resolve()
+
+    def validate(self):
+        """Validate calculator configuration settings."""
+
+        if self.max_history_size <= 0:
+            raise ConfigurationError(
+                "max_history_size must be positive"
+            )
+
+        if self.precision <= 0:
+            raise ConfigurationError(
+                "precision must be positive"
+            )
+
+        if self.max_input_value <= 0:
+            raise ConfigurationError(
+                "max_input_value must be positive"
+            )
 
 
 
