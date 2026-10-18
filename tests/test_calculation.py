@@ -1,8 +1,8 @@
-"""Unit tests for the Calculation class."""
-
 import pytest
 from app.calculation import Calculation
+from app.exceptions import OperationError, ValidationError
 
+"""Unit tests for the Calculation class."""
 
 def test_addition():
     """Test addition calculation."""
@@ -38,3 +38,26 @@ def test_root():
     """Test root calculation."""
     calc = Calculation(operation="root", operand1=16.0, operand2=2.0)
     assert calc.result == pytest.approx(4.0)
+
+def test_modulus():
+    """Test modulus calculation."""
+    calc = Calculation(operation="modulus", operand1=10.0, operand2=3.0)
+    assert calc.result == 1.0
+
+
+def test_integer_division():
+    """Test integer division calculation."""
+    calc = Calculation(operation="int_divide", operand1=10.0, operand2=3.0)
+    assert calc.result == 3.0
+
+
+def test_percentage():
+    """Test percentage calculation."""
+    calc = Calculation(operation="percent", operand1=25.0, operand2=100.0)
+    assert calc.result == 25.0
+
+
+def test_absolute_difference():
+    """Test absolute difference calculation."""
+    calc = Calculation(operation="abs_diff", operand1=10.0, operand2=15.0)
+    assert calc.result == 5.0
