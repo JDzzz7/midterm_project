@@ -35,6 +35,36 @@ def calculator_repl():
             print("History cleared.")
             continue
 
+        if command == "undo":
+            if calculator.undo():
+                print("Operation undone.")
+            else:
+                print("Nothing to undo.")
+            continue
+
+        if command == "redo":
+            if calculator.redo():
+                print("Operation redone.")
+            else:
+                print("Nothing to redo.")
+            continue
+
+        if command == "save":
+            try:
+                calculator.save_history()
+                print("History saved successfully.")
+            except (OSError, ValueError) as error:
+                print(f"Error saving history: {error}")
+            continue
+
+        if command == "load":
+            try:
+                calculator.load_history()
+                print("History loaded successfully.")
+            except (OSError, ValueError) as error:
+                print(f"Error loading history: {error}")
+            continue
+
         try:
             a = float(input("Enter first number: "))
             b = float(input("Enter second number: "))
