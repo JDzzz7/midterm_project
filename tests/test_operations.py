@@ -3,8 +3,10 @@
 import pytest
 from app.exceptions import ValidationError
 from app.operations import (
+    Operation, OperationFactory,
     Addition, Subtraction, Multiplication,
-    Division, Power, Root, Modulus, IntegerDivision, Percentage, AbsoluteDifference
+    Division, Power, Root, Modulus,
+    IntegerDivision, Percentage, AbsoluteDifference
 )
 
 class TestAddition:
@@ -250,4 +252,59 @@ class TestAbsoluteDifference:
         operation = AbsoluteDifference()
         result = operation.execute(a, b)
         assert result == pytest.approx(expected)
-        
+
+class TestOperationFactory:
+    """Test OperationFactory functionality."""
+
+    @pytest.mark.parametrize(
+        "name, expected_class",
+        [
+            ("add", Addition),
+            ("subtract", Subtraction),
+            ("multiply", Multiplication),
+            ("divide", Division),
+            ("power", Power),
+            ("root", Root),
+            ("modulus", Modulus),
+            ("int_divide", IntegerDivision),
+            ("percent", Percentage),
+            ("abs_diff", AbsoluteDifference),
+        ]
+    )
+    def test_create_valid_operations(self, name, expected_class):
+        """Test creating all supported operations."""
+        operation = OperationFactory.create_operation(name)
+
+        assert isinstance(operation, expected_class)
+
+    def test_case_insensitive_operations(self):
+        """Test that operation names are case-insensitive."""
+        operation = OperationFactory.create_operation("ADD")
+
+        assert isinstance(operation, Addition)
+
+    def test_create_invalid_operation(self):
+        """Test that an unsupported operation raises ValueError."""
+        with pytest.raises(ValueError, match="not supported"):
+            OperationFactory.create_operation("invalid_op")
+
+    def test_register_valid_operation(self):
+        """Test registering a custom operation."""
+
+        class NewOperation(Operation):
+            def execute(self, a, b):
+                return a + b
+
+        OperationFactory.register_operation("new_op", NewOperation)
+        operation = OperationFactory.create_operation("new_op")
+        assert isinstance(operation, NewOperation)
+        assert operation.execute(5, 3) == 8
+
+    def test_register_invalid_operation(self):
+        """Test rejecting a class that does not inherit from Operation."""
+
+        class InvalidOperation:
+            pass
+
+        with pytest.raises(TypeError, match="Invalid operation class"):
+            OperationFactory.register_operation("invalid", InvalidOperation)
