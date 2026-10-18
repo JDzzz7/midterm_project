@@ -144,3 +144,65 @@ def test_zero_to_negative_power():
             operand1=0.0,
             operand2=-2.0
         )
+
+def test_to_dict():
+    """Test converting a calculation into a dictionary."""
+    calc = Calculation(
+        operation="add",
+        operand1=2.0,
+        operand2=3.0
+    )
+
+    result_dict = calc.to_dict()
+
+    assert result_dict == {
+        "operation": "add",
+        "operand1": "2.0",
+        "operand2": "3.0",
+        "result": "5.0",
+        "timestamp": calc.timestamp.isoformat()
+    }
+
+def test_from_dict():
+    """Test reconstructing a calculation from a dictionary."""
+    data = {
+        "operation": "add",
+        "operand1": "2.0",
+        "operand2": "3.0",
+        "result": "5.0",
+        "timestamp": datetime.datetime.now().isoformat()
+    }
+
+    calc = Calculation.from_dict(data)
+
+    assert calc.operation == "add"
+    assert calc.operand1 == 2.0
+    assert calc.operand2 == 3.0
+    assert calc.result == 5.0
+    assert calc.timestamp == datetime.datetime.fromisoformat(data["timestamp"])
+
+
+def test_invalid_from_dict():
+    """Test that invalid calculation data raises OperationError."""
+    data = {
+        "operation": "add",
+        "operand1": "invalid",
+        "operand2": "3.0",
+        "result": "5.0",
+        "timestamp": datetime.datetime.now().isoformat()
+    }
+
+    with pytest.raises(OperationError, match="Invalid calculation data"):
+        Calculation.from_dict(data)
+
+
+def test_missing_from_dict_field():
+    """Test that missing dictionary fields raise OperationError."""
+    data = {
+        "operation": "add",
+        "operand1": "2.0"
+    }
+
+    with pytest.raises(OperationError, match="Invalid calculation data"):
+        Calculation.from_dict(data)
+        
