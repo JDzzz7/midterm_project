@@ -30,6 +30,11 @@ def calculator_repl():
 
             continue
 
+        if command == "clear":
+            calculator.clear_history()
+            print("History cleared.")
+            continue
+
         try:
             a = float(input("Enter first number: "))
             b = float(input("Enter second number: "))

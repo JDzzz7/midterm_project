@@ -72,7 +72,12 @@ class Calculator:
         """Show all recorded calculations."""
         return [str(calculation) for calculation in self.history]
 
-    
+    def clear_history(self):
+        """Clear calculation history."""
+        self.undo_stack.append(CalculatorMemento(self.history))
+        self.history.clear()
+        self.redo_stack.clear()
+
     def save_history(self):
         """Save the calculation history to a CSV file using pandas."""
 
