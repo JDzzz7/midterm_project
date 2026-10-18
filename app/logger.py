@@ -29,7 +29,13 @@ class Logger:
             self.logger.addHandler(handler)
 
     def log_calculation(self, calculation):
+        """Log a calculation."""
         self.logger.info(str(calculation))
 
+    def log_warning(self, message):
+        """Log warning messages."""
+        self.logger.warning(message)
+
     def log_error(self, message):
+        """Log error messages."""
         self.logger.error(message)
