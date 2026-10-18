@@ -79,6 +79,17 @@ def calculator_repl():
             print("  exit  - Exit the calculator")
             continue
 
+        """Check if the command is a valid operation. If not, inform the user and continue the loop."""
+        valid_operations = [
+            "add", "subtract", "multiply", "divide",
+            "power", "root", "modulus", "int_divide",
+            "percent", "abs_diff"
+        ]
+
+        if command not in valid_operations:
+            print(f"Unknown command: '{command}'. Type 'help' for available commands.")
+            continue
+
         try:
             """Ensure that the user can cancel the operation by typing 'cancel'."""
             a = input("Enter first number (or 'cancel'): ")
