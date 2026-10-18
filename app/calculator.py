@@ -39,4 +39,18 @@ class Calculator:
         self.history = previous_state.get_history()
 
         return True
+    
+    def redo(self):
+        """Restore the most recently undone calculation."""
+
+        if not self.redo_stack:
+            return False
+
+        current_state = CalculatorMemento(self.history)
+        self.undo_stack.append(current_state)
+
+        next_state = self.redo_stack.pop()
+        self.history = next_state.get_history()
+
+        return True
 
