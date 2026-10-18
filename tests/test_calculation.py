@@ -205,4 +205,38 @@ def test_missing_from_dict_field():
 
     with pytest.raises(OperationError, match="Invalid calculation data"):
         Calculation.from_dict(data)
-        
+
+def test_format_result():
+    """Test formatting results to different decimal places."""
+    calc = Calculation(
+        operation="divide",
+        operand1=1.0,
+        operand2=3.0
+    )
+
+    assert calc.format_result(precision=2) == "0.33"
+    assert calc.format_result(precision=10) == "0.3333333333"
+
+
+def test_equality():
+    """Test equality between calculations."""
+    calc1 = Calculation("add", 2.0, 3.0)
+    calc2 = Calculation("add", 2.0, 3.0)
+    calc3 = Calculation("subtract", 5.0, 3.0)
+
+    assert calc1 == calc2
+    assert calc1 != calc3
+
+
+def test_equality_with_non_calculation():
+    """Test comparing a calculation with another object type."""
+    calc = Calculation("add", 2.0, 3.0)
+
+    assert calc.__eq__("not a calculation") is NotImplemented
+
+
+def test_format_result_zero_precision():
+    """Test formatting a result without decimal places."""
+    calc = Calculation("add", 2.0, 3.0)
+
+    assert calc.format_result(precision=0) == "5"
