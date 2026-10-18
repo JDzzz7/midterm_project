@@ -308,3 +308,11 @@ class TestOperationFactory:
 
         with pytest.raises(TypeError, match="Invalid operation class"):
             OperationFactory.register_operation("invalid", InvalidOperation)
+
+class TestOperation:
+    """Test base Operation class functionality."""
+
+    def test_abstract_operation(self):
+        """Test that Operation cannot be instantiated directly."""
+        with pytest.raises(TypeError):
+            Operation()
