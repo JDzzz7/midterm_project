@@ -23,3 +23,18 @@ class LoggingObserver(HistoryObserver):
             raise AttributeError("Calculation must not be None")
 
         self.logger.log_calculation(calculation)
+
+class AutoSaveObserver(HistoryObserver):
+    """An Auto Save Observer that saves calculation history when enabled."""
+
+    def __init__(self, calculator):
+        self.calculator = calculator
+
+    def update(self, calculation):
+        """Save history when a new calculation is done."""
+
+        if calculation is None:
+            raise AttributeError("Calculation cannot be None")
+
+        if self.calculator.config.auto_save:
+            self.calculator.save_history()
