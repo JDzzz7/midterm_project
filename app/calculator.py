@@ -24,3 +24,19 @@ class Calculator:
     def show_history(self):
         """Display all recorded calculations."""
         return [str(calculation) for calculation in self.history]
+
+    
+    def undo(self):
+        """Restore the history before the last calculation."""
+
+        if not self.undo_stack:
+            return False
+
+        current_state = CalculatorMemento(self.history)
+        self.redo_stack.append(current_state)
+
+        previous_state = self.undo_stack.pop()
+        self.history = previous_state.get_history()
+
+        return True
+
