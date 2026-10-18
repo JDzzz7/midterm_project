@@ -2,7 +2,10 @@
 
 import pytest
 from app.exceptions import ValidationError
-from app.operations import Addition, Subtraction, Multiplication, Division, Power, Root
+from app.operations import (
+    Addition, Subtraction, Multiplication,
+    Division, Power, Root, Modulus, IntegerDivision, Percentage, AbsoluteDifference
+)
 
 class TestAddition:
     """Test Addition operation."""
@@ -147,3 +150,104 @@ class TestRoot:
         operation = Root()
         with pytest.raises(ValidationError):
             operation.execute(a, b)
+
+class TestModulus:
+    """Test Modulus operation."""
+
+    @pytest.mark.parametrize(
+        "a, b, expected",
+        [
+            (10, 3, 1),
+            (15, 5, 0),
+            (7, 2, 1),
+            (-10, 3, 2),
+            (10, -3, -2),
+            (5.5, 2, 1.5),
+        ]
+    )
+    def test_valid_operations(self, a, b, expected):
+        """Test modulus with different valid inputs."""
+        operation = Modulus()
+        result = operation.execute(a, b)
+        assert result == pytest.approx(expected)
+
+    def test_modulus_by_zero(self):
+        """Test that modulus by zero raises an error."""
+        operation = Modulus()
+        with pytest.raises((ValidationError, ZeroDivisionError)):
+            operation.execute(10, 0)
+
+class TestIntegerDivision:
+    """Test Integer Division operation."""
+
+    @pytest.mark.parametrize(
+        "a, b, expected",
+        [
+            (10, 3, 3),
+            (15, 5, 3),
+            (7, 2, 3),
+            (-10, 3, -4),
+            (10, -3, -4),
+            (5.5, 2, 2),
+        ]
+    )
+    def test_valid_operations(self, a, b, expected):
+        """Test integer division with different valid inputs."""
+        operation = IntegerDivision()
+        result = operation.execute(a, b)
+        assert result == pytest.approx(expected)
+
+    def test_integer_division_by_zero(self):
+        """Test that integer division by zero raises an error."""
+        operation = IntegerDivision()
+        with pytest.raises((ValidationError, ZeroDivisionError)):
+            operation.execute(10, 0)
+
+class TestPercentage:
+    """Test Percentage operation."""
+
+    @pytest.mark.parametrize(
+        "a, b, expected",
+        [
+            (25, 100, 25),
+            (50, 200, 25),
+            (75, 100, 75),
+            (0, 100, 0),
+            (100, 100, 100),
+            (25, 50, 50),
+            (12.5, 50, 25),
+        ]
+    )
+    def test_valid_operations(self, a, b, expected):
+        """Test percentage with different valid inputs."""
+        operation = Percentage()
+        result = operation.execute(a, b)
+        assert result == pytest.approx(expected)
+
+    def test_percentage_by_zero(self):
+        """Test that percentage with a zero denominator raises an error."""
+        operation = Percentage()
+        with pytest.raises((ValidationError, ZeroDivisionError)):
+            operation.execute(25, 0)
+
+class TestAbsoluteDifference:
+    """Test Absolute Difference operation."""
+
+    @pytest.mark.parametrize(
+        "a, b, expected",
+        [
+            (10, 5, 5),
+            (5, 10, 5),
+            (-10, 5, 15),
+            (10, -5, 15),
+            (-10, -5, 5),
+            (5, 5, 0),
+            (5.5, 3.3, 2.2),
+        ]
+    )
+    def test_valid_operations(self, a, b, expected):
+        """Test absolute difference with different valid inputs."""
+        operation = AbsoluteDifference()
+        result = operation.execute(a, b)
+        assert result == pytest.approx(expected)
+        
