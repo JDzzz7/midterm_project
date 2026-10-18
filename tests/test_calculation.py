@@ -61,3 +61,32 @@ def test_absolute_difference():
     """Test absolute difference calculation."""
     calc = Calculation(operation="abs_diff", operand1=10.0, operand2=15.0)
     assert calc.result == 5.0
+
+def test_division_by_zero():
+    """Test division by zero raises an error."""
+    with pytest.raises(ValidationError):
+        Calculation(operation="divide", operand1=8.0, operand2=0.0)
+
+
+def test_invalid_root():
+    """Test even root of a negative number raises an error."""
+    with pytest.raises(ValidationError):
+        Calculation(operation="root", operand1=-16.0, operand2=2.0)
+
+
+def test_zero_root():
+    """Test zero-degree root raises an error."""
+    with pytest.raises(ValidationError):
+        Calculation(operation="root", operand1=16.0, operand2=0.0)
+
+
+def test_negative_power():
+    """Test that negative exponents are supported."""
+    calc = Calculation(operation="power", operand1=2.0, operand2=-3.0)
+    assert calc.result == pytest.approx(0.125)
+
+
+def test_unknown_operation():
+    """Test unsupported operations raise OperationError."""
+    with pytest.raises(OperationError, match="not supported"):
+        Calculation(operation="unknown", operand1=5.0, operand2=3.0)
