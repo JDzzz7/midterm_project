@@ -53,3 +53,19 @@ class Calculation:
 
         except (KeyError, ValueError, TypeError, OverflowError) as error:
             raise OperationError(f"Invalid calculation data: {error}") from error
+
+    def format_result(self, precision=2):
+        """Format the calculation result to the specified decimal places."""
+        return f"{self.result:.{precision}f}"
+
+    def __eq__(self, other):
+        """Compare two calculations based on their values."""
+        if not isinstance(other, Calculation):
+            return NotImplemented
+
+        return (
+            self.operation == other.operation
+            and self.operand1 == other.operand1
+            and self.operand2 == other.operand2
+            and self.result == other.result
+        )
