@@ -3,6 +3,7 @@ from app.calculator_memento import CalculatorMemento
 from app.history import HistoryObserver
 from app.calculator_config import CalculatorConfig
 import pandas as pd
+import datetime
 
 class Calculator:
     """Perform calculations and manage calculation history."""
@@ -80,6 +81,35 @@ class Calculator:
             index=False,
             encoding=self.config.default_encoding
         )
+
+    def load_history(self):
+        """Load the calculation history from a CSV file using pandas."""
+
+        if not self.config.history_file.exists():
+            return
+
+        df = pd.read_csv(
+            self.config.history_file,
+            encoding=self.config.default_encoding
+        )
+
+        self.history = []
+
+        for _, row in df.iterrows():
+            calculation = Calculation(
+                row["operation"],
+                float(row["operand1"]),
+                float(row["operand2"])
+            )
+
+            calculation.timestamp = datetime.datetime.fromisoformat(
+                row["timestamp"]
+            )
+
+            self.history.append(calculation)
+
+        self.undo_stack.clear()
+        self.redo_stack.clear()
 
     def undo(self):
         """Restore the history before the last calculation."""
