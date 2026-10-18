@@ -1,5 +1,6 @@
 from app.calculation import Calculation
 from app.calculator_memento import CalculatorMemento
+from app.history import HistoryObserver
 
 class Calculator:
     """Perform calculations and manage calculation history."""
@@ -8,6 +9,22 @@ class Calculator:
         self.history = []
         self.undo_stack = []
         self.redo_stack = []
+        self.observers = []
+
+    def add_observer(self, observer: HistoryObserver):
+        """Add an observer."""
+        self.observers.append(observer)
+    
+    def remove_observer(self, observer: HistoryObserver):
+        """Remove an observer."""
+        self.observers.remove(observer)
+    
+    def notify_observers(self, calculation: Calculation):
+        """Notify all observers when a calculation is performed."""
+
+        for observer in self.observers:
+            observer.update(calculation)
+
 
     def perform_operation(self, operation, a, b):
         """Calculate a result and save it in history."""
@@ -18,6 +35,7 @@ class Calculator:
 
         self.history.append(calculation)
         self.redo_stack.clear()
+        self.notify_observers(calculation)
 
         return calculation.result
 
