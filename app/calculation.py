@@ -16,13 +16,20 @@ class Calculation:
     def calculate(self):
         """Performs the following selected arithmetic operation."""
 
+        if self.operation == "root":
+            if self.operand2 == 0:
+                raise OperationError("Root degree cannot be zero")
+
+        if self.operand1 < 0 and self.operand2.is_integer() and int(self.operand2) % 2 == 0:
+            raise OperationError("Cannot calculate an even root of a negative number")
+
         operations = {
             "add": lambda a, b: a + b,
             "subtract": lambda a, b: a - b,
             "multiply": lambda a, b: a * b,
             "divide": lambda a, b: a / b,
             "power": lambda a, b: a ** b,
-            "root": lambda a, b: a ** (1 / b),
+            "root": lambda a, b: -((-a) ** (1 / b)) if a < 0 else a ** (1 / b),
             "modulus": lambda a, b: a % b,
             "int_divide": lambda a, b: a // b,
             "percent": lambda a, b: (a / b) * 100,
