@@ -1,6 +1,6 @@
 from app.calculation import Calculation
 from app.calculator_memento import CalculatorMemento
-from app.history import HistoryObserver
+from app.history import HistoryObserver, LoggingObserver, AutoSaveObserver
 from app.calculator_config import CalculatorConfig
 from app.exceptions import ValidationError
 from app.input_validators import InputValidator
@@ -14,10 +14,14 @@ class Calculator:
     def __init__(self):
         self.config = CalculatorConfig()
         self.config.validate()
+
         self.history = []
         self.undo_stack = []
         self.redo_stack = []
         self.observers = []
+        
+        self.add_observer(LoggingObserver())
+        self.add_observer(AutoSaveObserver(self))
         self.logger = Logger()
 
     def add_observer(self, observer: HistoryObserver):
