@@ -80,8 +80,18 @@ def calculator_repl():
             continue
 
         try:
-            a = float(input("Enter first number: "))
-            b = float(input("Enter second number: "))
+            """Ensure that the user can cancel the operation by typing 'cancel'."""
+            a = input("Enter first number (or 'cancel'): ")
+
+            if a.strip().lower() == "cancel":
+                print("Operation cancelled.")
+                continue
+
+            b = input("Enter second number (or 'cancel'): ")
+
+            if b.strip().lower() == "cancel":
+                print("Operation cancelled.")
+                continue
 
             result = calculator.perform_operation(command, a, b)
             print(f"Result: {result}")
