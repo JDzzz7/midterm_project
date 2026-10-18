@@ -40,6 +40,7 @@ class Calculator:
         b = InputValidator.validate_number(b, self.config)
                 
         calculation = Calculation(operation, a, b)
+        calculation.result = round(calculation.result, self.config.precision)
 
         snapshot = CalculatorMemento(self.history)
         self.undo_stack.append(snapshot)
