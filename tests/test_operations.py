@@ -316,3 +316,9 @@ class TestOperation:
         """Test that Operation cannot be instantiated directly."""
         with pytest.raises(TypeError):
             Operation()
+
+    def test_str_representation(self):
+        """Test that string representation returns the class name."""
+        operation = Addition()
+
+        assert str(operation) == "Addition"    
