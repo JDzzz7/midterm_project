@@ -250,3 +250,53 @@ def test_repr_representation():
     assert "operand1=2.0" in result
     assert "operand2=3.0" in result
     assert "result=5.0" in result
+
+def test_from_dict_invalid_timestamp():
+    """Test that an invalid timestamp raises OperationError."""
+    data = {
+        "operation": "add",
+        "operand1": "2.0",
+        "operand2": "3.0",
+        "result": "5.0",
+        "timestamp": "invalid-date"
+    }
+
+    with pytest.raises(OperationError, match="Invalid calculation data"):
+        Calculation.from_dict(data)
+
+def test_from_dict_invalid_operation():
+    """Test that an unsupported operation raises OperationError."""
+    data = {
+        "operation": "unknown",
+        "operand1": "2.0",
+        "operand2": "3.0",
+        "result": "5.0",
+        "timestamp": datetime.datetime.now().isoformat()
+    }
+
+    with pytest.raises(OperationError):
+        Calculation.from_dict(data)
+
+def test_from_dict_mismatched_result():
+    """Test that the calculation result is recalculated."""
+    data = {
+        "operation": "add",
+        "operand1": "2.0",
+        "operand2": "3.0",
+        "result": "100.0",
+        "timestamp": datetime.datetime.now().isoformat()
+    }
+
+    calc = Calculation.from_dict(data)
+
+    assert calc.result == 5.0
+    assert calc.result != float(data["result"])
+
+def test_to_dict_from_dict_round_trip():
+    """Test converting a calculation to a dictionary and back."""
+    original = Calculation("multiply", 4.0, 5.0)
+
+    restored = Calculation.from_dict(original.to_dict())
+
+    assert restored == original
+    assert restored.timestamp == original.timestamp
