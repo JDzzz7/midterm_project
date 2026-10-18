@@ -83,3 +83,41 @@ class AbsoluteDifference(Operation):
     """Implementation of absolute difference operation."""
     def execute(self, a, b):
         return abs(a - b)
+
+
+class OperationFactory:
+    """Factory class for creating calculator operations based on their names."""
+
+    _operation_types = {
+        "add": Addition,
+        "subtract": Subtraction,
+        "multiply": Multiplication,
+        "divide": Division,
+        "power": Power,
+        "root": Root,
+        "modulus": Modulus,
+        "int_divide": IntegerDivision,
+        "percent": Percentage,
+        "abs_diff": AbsoluteDifference
+    }
+
+    @classmethod
+    def register_operation(cls, name, operation_class):
+        """Register a new operation to the factory."""
+        if not isinstance(operation_class, type) or not issubclass(
+            operation_class, Operation
+        ):
+            raise TypeError("Invalid operation class")
+
+        cls._operation_types[name.lower()] = operation_class
+
+    @classmethod
+    def create_operation(cls, name):
+        """Return an instance of the requested operation."""
+        operation = cls._operation_types.get(name.lower())
+
+        if operation is None:
+            raise ValueError(f"Operation '{name}' is not supported")
+
+        return operation()
+
