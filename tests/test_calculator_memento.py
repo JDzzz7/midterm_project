@@ -49,3 +49,48 @@ def test_memento_timestamp():
 
     assert isinstance(memento.timestamp, datetime.datetime)
     assert before <= memento.timestamp <= after
+
+def test_memento_to_dict():
+    """Test converting a memento into a dictionary."""
+    calculation = Calculation(
+        operation="add",
+        operand1=2.0,
+        operand2=3.0
+    )
+
+    memento = CalculatorMemento(history=[calculation])
+    data = memento.to_dict()
+
+    assert "history" in data
+    assert "timestamp" in data
+    assert len(data["history"]) == 1
+    assert data["history"][0]["operation"] == "add"
+    assert data["history"][0]["operand1"] == "2.0"
+    assert data["history"][0]["operand2"] == "3.0"
+    assert data["history"][0]["result"] == "5.0"
+
+def test_memento_from_dict():
+    """Test restoring a memento from a dictionary."""
+    timestamp = datetime.datetime.now()
+
+    data = {
+        "history": [
+            {
+                "operation": "add",
+                "operand1": "2.0",
+                "operand2": "3.0",
+                "result": "5.0",
+                "timestamp": timestamp.isoformat()
+            }
+        ],
+        "timestamp": timestamp.isoformat()
+    }
+
+    memento = CalculatorMemento.from_dict(data)
+
+    assert len(memento.history) == 1
+    assert memento.history[0].operation == "add"
+    assert memento.history[0].operand1 == 2.0
+    assert memento.history[0].operand2 == 3.0
+    assert memento.history[0].result == 5.0
+    assert memento.timestamp == timestamp
