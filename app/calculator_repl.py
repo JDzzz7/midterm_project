@@ -19,6 +19,17 @@ def calculator_repl():
             print("Goodbye!")
             break
 
+        if command == "history":
+            history = calculator.show_history()
+
+            if not history:
+                print("No calculations in history.")
+            else:
+                for calculation in history:
+                    print(calculation)
+
+            continue
+
         try:
             a = float(input("Enter first number: "))
             b = float(input("Enter second number: "))
