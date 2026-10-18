@@ -181,7 +181,6 @@ def test_from_dict():
     assert calc.result == 5.0
     assert calc.timestamp == datetime.datetime.fromisoformat(data["timestamp"])
 
-
 def test_invalid_from_dict():
     """Test that invalid calculation data raises OperationError."""
     data = {
@@ -194,7 +193,6 @@ def test_invalid_from_dict():
 
     with pytest.raises(OperationError, match="Invalid calculation data"):
         Calculation.from_dict(data)
-
 
 def test_missing_from_dict_field():
     """Test that missing dictionary fields raise OperationError."""
@@ -217,7 +215,6 @@ def test_format_result():
     assert calc.format_result(precision=2) == "0.33"
     assert calc.format_result(precision=10) == "0.3333333333"
 
-
 def test_equality():
     """Test equality between calculations."""
     calc1 = Calculation("add", 2.0, 3.0)
@@ -227,16 +224,29 @@ def test_equality():
     assert calc1 == calc2
     assert calc1 != calc3
 
-
 def test_equality_with_non_calculation():
     """Test comparing a calculation with another object type."""
     calc = Calculation("add", 2.0, 3.0)
 
     assert calc.__eq__("not a calculation") is NotImplemented
 
-
 def test_format_result_zero_precision():
     """Test formatting a result without decimal places."""
     calc = Calculation("add", 2.0, 3.0)
 
     assert calc.format_result(precision=0) == "5"
+
+def test_repr_representation():
+    """Test the detailed representation of a calculation."""
+    calc = Calculation(
+        operation="add",
+        operand1=2.0,
+        operand2=3.0
+    )
+
+    result = repr(calc)
+
+    assert "Calculation(operation='add'" in result
+    assert "operand1=2.0" in result
+    assert "operand2=3.0" in result
+    assert "result=5.0" in result

@@ -69,3 +69,11 @@ class Calculation:
             and self.operand2 == other.operand2
             and self.result == other.result
         )
+    def __repr__(self):
+        """Return a detailed string representation of the calculation."""
+        return (
+            f"Calculation(operation='{self.operation}', "
+            f"operand1={self.operand1}, "
+            f"operand2={self.operand2}, "
+            f"result={self.result})"
+        )
