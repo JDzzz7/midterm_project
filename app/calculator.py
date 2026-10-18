@@ -6,6 +6,7 @@ from app.exceptions import ValidationError
 from app.input_validators import InputValidator
 import pandas as pd
 import datetime
+from app.logger import Logger
 
 class Calculator:
     """Perform calculations and manage calculation history."""
@@ -17,6 +18,7 @@ class Calculator:
         self.undo_stack = []
         self.redo_stack = []
         self.observers = []
+        self.logger = Logger()
 
     def add_observer(self, observer: HistoryObserver):
         """Add an observer."""
@@ -36,8 +38,15 @@ class Calculator:
     def perform_operation(self, operation, a, b):
         """Calculate a result and save it in history."""
 
-        a = InputValidator.validate_number(a, self.config)
-        b = InputValidator.validate_number(b, self.config)
+        try:
+            a = InputValidator.validate_number(a, self.config)
+            b = InputValidator.validate_number(b, self.config)
+
+            calculation = Calculation(operation, a, b)
+
+        except Exception as e:
+            self.logger.log_error(f"Calculation failed: {e}")
+            raise
                 
         calculation = Calculation(operation, a, b)
         calculation.result = round(calculation.result, self.config.precision)
