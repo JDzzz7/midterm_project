@@ -65,6 +65,20 @@ def calculator_repl():
                 print(f"Error loading history: {error}")
             continue
 
+        if command == "help":
+            print("\nAvailable commands:")
+            print("  add, subtract, multiply, divide")
+            print("  power, root, modulus, int_divide, percent, abs_diff")
+            print("  history - Show calculation history")
+            print("  clear - Clear calculation history")
+            print("  undo  - Undo the last operation")
+            print("  redo  - Redo the last undone operation")
+            print("  save  - Save history to CSV")
+            print("  load  - Load history from CSV")
+            print("  help  - Display available commands")
+            print("  exit  - Exit the calculator")
+            continue
+
         try:
             a = float(input("Enter first number: "))
             b = float(input("Enter second number: "))
