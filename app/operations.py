@@ -32,3 +32,33 @@ class Division(Operation):
         if b == 0:
             raise ValueError("The divisor cannot be zero.")
         return a / b
+
+class Power(Operation):
+    """Implementation of power operation."""
+    def execute(self, a, b):
+        return a ** b
+
+
+class Root(Operation):
+    """Implementation of root operation."""
+    def execute(self, a, b):
+        if b == 0:
+            raise ValueError("Root degree must not be zero")
+
+        if a < 0:
+            if not float(b).is_integer() or int(b) % 2 == 0:
+                raise ValueError(
+                    "Negative numbers must have an odd integer root"
+                )
+            return -((-a) ** (1 / b))
+
+        return a ** (1 / b)
+
+
+class Modulus(Operation):
+    """Implementation of modulus operation."""
+    def execute(self, a, b):
+        if b == 0:
+            raise ValueError("Modulus by zero cannot be calculated")
+        return a % b
+
