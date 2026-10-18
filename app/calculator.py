@@ -1,11 +1,15 @@
 from app.calculation import Calculation
 from app.calculator_memento import CalculatorMemento
 from app.history import HistoryObserver
+from app.calculator_config import CalculatorConfig
+import pandas as pd
 
 class Calculator:
     """Perform calculations and manage calculation history."""
 
     def __init__(self):
+        self.config = CalculatorConfig()
+        self.config.validate()
         self.history = []
         self.undo_stack = []
         self.redo_stack = []
@@ -34,16 +38,49 @@ class Calculator:
         self.undo_stack.append(snapshot)
 
         self.history.append(calculation)
+
+        if len(self.history) > self.config.max_history_size:
+            self.history.pop(0)
+
         self.redo_stack.clear()
         self.notify_observers(calculation)
 
         return calculation.result
 
     def show_history(self):
-        """Display all recorded calculations."""
+        """Show all recorded calculations."""
         return [str(calculation) for calculation in self.history]
 
     
+    def save_history(self):
+        """Save the calculation history to a CSV file using pandas."""
+
+        self.config.history_dir.mkdir(parents=True, exist_ok=True)
+
+        history_data = []
+
+        for calculation in self.history:
+            history_data.append({
+                "operation": calculation.operation,
+                "operand1": calculation.operand1,
+                "operand2": calculation.operand2,
+                "result": calculation.result,
+                "timestamp": calculation.timestamp.isoformat()
+            })
+
+        columns = [
+            "operation", "operand1", "operand2",
+            "result", "timestamp"
+        ]
+
+        df = pd.DataFrame(history_data, columns=columns)
+
+        df.to_csv(
+            self.config.history_file,
+            index=False,
+            encoding=self.config.default_encoding
+        )
+
     def undo(self):
         """Restore the history before the last calculation."""
 
