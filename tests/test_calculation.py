@@ -1,4 +1,5 @@
 import pytest
+import datetime
 from app.calculation import Calculation
 from app.exceptions import OperationError, ValidationError
 
@@ -90,3 +91,56 @@ def test_unknown_operation():
     """Test unsupported operations raise OperationError."""
     with pytest.raises(OperationError, match="not supported"):
         Calculation(operation="unknown", operand1=5.0, operand2=3.0)
+
+def test_timestamp():
+    """Test that a calculation records a timestamp."""
+    before = datetime.datetime.now()
+
+    calc = Calculation(
+        operation="add",
+        operand1=2.0,
+        operand2=3.0
+    )
+
+    after = datetime.datetime.now()
+
+    assert isinstance(calc.timestamp, datetime.datetime)
+    assert before <= calc.timestamp <= after
+
+def test_str_representation():
+    """Test the string representation of a calculation."""
+    calc = Calculation(
+        operation="add",
+        operand1=2.0,
+        operand2=3.0
+    )
+
+    assert str(calc) == "add(2.0, 3.0) = 5.0"
+
+def test_negative_cube_root():
+    """Test the cube root of a negative number."""
+    calc = Calculation(
+        operation="root",
+        operand1=-27.0,
+        operand2=3.0
+    )
+
+    assert calc.result == pytest.approx(-3.0)
+
+def test_modulus_by_zero():
+    """Test that modulus by zero raises ValidationError."""
+    with pytest.raises(ValidationError):
+        Calculation(
+            operation="modulus",
+            operand1=10.0,
+            operand2=0.0
+        )
+
+def test_zero_to_negative_power():
+    """Test that zero raised to a negative power raises an error."""
+    with pytest.raises((ValidationError, OperationError)):
+        Calculation(
+            operation="power",
+            operand1=0.0,
+            operand2=-2.0
+        )
