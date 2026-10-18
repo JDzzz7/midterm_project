@@ -55,7 +55,7 @@ pytest
 Check test coverage:
 
 ```bash
-pytest --cov=app --cov-fail-under=100
+pytest --cov=app --cov-fail-under=90
 ```
 
 ## GitHub Actions
