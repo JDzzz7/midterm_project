@@ -2,6 +2,7 @@ from app.calculation import Calculation
 from app.calculator_memento import CalculatorMemento
 from app.history import HistoryObserver
 from app.calculator_config import CalculatorConfig
+from app.exceptions import ValidationError
 import pandas as pd
 import datetime
 
@@ -33,6 +34,10 @@ class Calculator:
 
     def perform_operation(self, operation, a, b):
         """Calculate a result and save it in history."""
+
+        if abs(a) > self.config.max_input_value or abs(b) > self.config.max_input_value:
+            raise ValidationError("Input exceeds maximum allowed value")
+        
         calculation = Calculation(operation, a, b)
 
         snapshot = CalculatorMemento(self.history)
