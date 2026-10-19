@@ -1,17 +1,30 @@
 import pytest
 
+from pathlib import Path
+from unittest.mock import patch, PropertyMock
 from app.calculator import Calculator
 from app.calculator_config import CalculatorConfig
 
 @pytest.fixture
 def calculator(tmp_path):
-    """Create a calculator with temporary storage directories."""
-    config = CalculatorConfig()
-    config.history_dir = str(tmp_path / "history")
-    config.log_dir = str(tmp_path / "logs")
-    config.auto_save = False
+    """Create a calculator with temporary directories."""
 
-    return Calculator(config=config)
+    with patch.object(
+        CalculatorConfig, "history_dir", new_callable=PropertyMock
+    ) as mock_history_dir, patch.object(
+        CalculatorConfig, "history_file", new_callable=PropertyMock
+    ) as mock_history_file, patch.object(
+        CalculatorConfig, "log_dir", new_callable=PropertyMock
+    ) as mock_log_dir, patch.object(
+        CalculatorConfig, "log_file", new_callable=PropertyMock
+    ) as mock_log_file:
+
+        mock_history_dir.return_value = tmp_path / "history"
+        mock_history_file.return_value = tmp_path / "history" / "calculator_history.csv"
+        mock_log_dir.return_value = tmp_path / "logs"
+        mock_log_file.return_value = tmp_path / "logs" / "calculator.log"
+
+        yield Calculator()
 
 def test_calculator_initialization(calculator):
     """Test that a calculator starts with empty history."""
