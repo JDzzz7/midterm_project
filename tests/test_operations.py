@@ -342,3 +342,14 @@ def test_validate_operands_success():
 
     operation = TestOperation()
     assert operation.validate_operands(2, 3) is None
+    assert operation.validate_operands(2.5, -3.5) is None
+
+def test_validate_operands_invalid_type():
+    """Test that invalid operand types raise ValidationError."""
+
+    with pytest.raises(
+        ValidationError,
+        match="Both operands must be valid numbers"
+    ):
+        Addition().validate_operands("invalid", 5)
+       
