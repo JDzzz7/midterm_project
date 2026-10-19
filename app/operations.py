@@ -14,7 +14,6 @@ class Operation(ABC):
         for value in (a, b):
             if isinstance(value, bool) or not isinstance(value, (int, float)):
                 raise ValidationError("Both operands must be valid numbers (int or float).")
-        pass
 
     def __str__(self):
         """Return the operation name."""
