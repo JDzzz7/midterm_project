@@ -146,6 +146,29 @@ class Calculator:
             raise OperationError(
                 f"Failed to load history: {error}"
             ) from error
+    def get_history_dataframe(self):
+        """Return calculation history as a pandas DataFrame."""
+        history_data = []
+
+        for calculation in self.history:
+            history_data.append({
+                "operation": calculation.operation,
+                "operand1": calculation.operand1,
+                "operand2": calculation.operand2,
+                "result": calculation.result,
+                "timestamp": calculation.timestamp.isoformat()
+            })
+
+        return pd.DataFrame(
+            history_data,
+            columns=[
+                "operation",
+                "operand1",
+                "operand2",
+                "result",
+                "timestamp"
+            ]
+        )
 
     def undo(self):
         """Restore the history before the last calculation."""
