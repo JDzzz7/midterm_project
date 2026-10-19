@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import patch, PropertyMock
 from app.calculator import Calculator
 from app.calculator_config import CalculatorConfig
+from app.exceptions import OperationError, ValidationError
 
 @pytest.fixture
 def calculator(tmp_path):
@@ -101,4 +102,38 @@ def test_calculator_absolute_difference(calculator):
 
     assert result == 7.0
     assert len(calculator.history) == 1
+
+def test_calculator_invalid_first_operand(calculator):
+    """Test invalid first operand."""
+    with pytest.raises(ValidationError):
+        calculator.perform_operation("add", "invalid", 3.0)
+
+def test_calculator_invalid_second_operand(calculator):
+    """Test invalid second operand."""
+    with pytest.raises(ValidationError):
+        calculator.perform_operation("add", 2.0, "invalid")
+
+def test_calculator_division_by_zero(calculator):
+    """Test division by zero."""
+    with pytest.raises((ValidationError, OperationError)):
+        calculator.perform_operation("divide", 10.0, 0.0)
+
+def test_calculator_invalid_operation(calculator):
+    """Test unsupported operation."""
+    with pytest.raises(OperationError):
+        calculator.perform_operation("unknown", 2.0, 3.0)
+
+def test_calculator_invalid_root(calculator):
+    """Test an even root of a negative number."""
+    with pytest.raises((ValidationError, OperationError)):
+        calculator.perform_operation("root", -16.0, 2.0)
+
+def test_calculator_error_does_not_change_history(calculator):
+    """Test that failed calculations are not added to history."""
+    with pytest.raises(ValidationError):
+        calculator.perform_operation("divide", 10.0, 0.0)
+
+    assert calculator.history == []
+    assert calculator.undo_stack == []
+    assert calculator.redo_stack == []
     
