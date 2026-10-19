@@ -63,3 +63,65 @@ def test_repl_multiplication(monkeypatch, capsys):
     output = capsys.readouterr().out
     assert "Result: 20.0" in output
 
+def test_repl_history_empty(monkeypatch, capsys):
+    """Test displaying empty calculation history."""
+    inputs = iter(["history", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "No calculations in history." in output
+
+def test_repl_history_with_entry(monkeypatch, capsys):
+    """Test displaying calculation history."""
+    inputs = iter(["add", "2", "3", "history", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "add(2.0, 3.0) = 5.0" in output
+
+def test_repl_clear(monkeypatch, capsys):
+    """Test clearing calculation history."""
+    inputs = iter(["add", "2", "3", "clear", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "History cleared." in output
+
+def test_repl_undo_empty(monkeypatch, capsys):
+    """Test undo when there is nothing to undo."""
+    inputs = iter(["undo", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Nothing to undo." in output
+
+def test_repl_undo_success(monkeypatch, capsys):
+    """Test successfully undoing a calculation."""
+    inputs = iter(["add", "2", "3", "undo", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Operation undone." in output
+
+def test_repl_redo_empty(monkeypatch, capsys):
+    """Test redo when there is nothing to redo."""
+    inputs = iter(["redo", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Nothing to redo." in output
+
+def test_repl_redo_success(monkeypatch, capsys):
+    """Test successfully redoing a calculation."""
+    inputs = iter(["add", "2", "3", "undo", "redo", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Operation redone." in output
