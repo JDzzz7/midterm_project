@@ -235,4 +235,47 @@ def test_calculator_new_operation_clears_redo(calculator):
     assert calculator.redo_stack == []
     assert len(calculator.history) == 1
     assert calculator.history[0].result == 20.0
-    
+
+def test_calculator_clear_history(calculator):
+    """Test clearing calculator history."""
+    calculator.perform_operation("add", 2.0, 3.0)
+    calculator.perform_operation("multiply", 4.0, 5.0)
+
+    calculator.clear_history()
+
+    assert calculator.history == []
+    assert calculator.undo_stack == []
+    assert calculator.redo_stack == []
+
+def test_calculator_clear_empty_history(calculator):
+    """Test clearing history when it is already empty."""
+    calculator.clear_history()
+
+    assert calculator.history == []
+
+def test_calculator_show_history(calculator):
+    """Test displaying calculation history."""
+    calculator.perform_operation("add", 2.0, 3.0)
+    calculator.perform_operation("multiply", 4.0, 5.0)
+
+    history = calculator.show_history()
+    assert len(history) == 2
+    assert history[0] == "add(2.0, 3.0) = 5.0"
+    assert history[1] == "multiply(4.0, 5.0) = 20.0"
+
+def test_calculator_show_empty_history(calculator):
+    """Test displaying empty calculation history."""
+    history = calculator.show_history()
+
+    assert history == []
+
+def test_calculator_max_history_size(calculator):
+    """Test that history does not exceed its maximum size."""
+    calculator.config.max_history_size = 2
+    calculator.perform_operation("add", 1.0, 2.0)
+    calculator.perform_operation("add", 3.0, 4.0)
+    calculator.perform_operation("add", 5.0, 6.0)
+
+    assert len(calculator.history) == 2
+    assert calculator.history[0].result == 7.0
+    assert calculator.history[1].result == 11.0
