@@ -1,8 +1,10 @@
+from dbm import error
+
 from app.calculation import Calculation
 from app.calculator_memento import CalculatorMemento
 from app.history import HistoryObserver, LoggingObserver, AutoSaveObserver
 from app.calculator_config import CalculatorConfig
-from app.exceptions import ValidationError
+from app.exceptions import OperationError, ValidationError
 from app.input_validators import InputValidator
 import pandas as pd
 import datetime
@@ -80,61 +82,70 @@ class Calculator:
 
     def save_history(self):
         """Save the calculation history to a CSV file using pandas."""
+        try:
+            self.config.history_dir.mkdir(parents=True, exist_ok=True)
 
-        self.config.history_dir.mkdir(parents=True, exist_ok=True)
+            history_data = []
 
-        history_data = []
+            for calculation in self.history:
+                history_data.append({
+                    "operation": calculation.operation,
+                    "operand1": calculation.operand1,
+                    "operand2": calculation.operand2,
+                    "result": calculation.result,
+                    "timestamp": calculation.timestamp.isoformat()
+                })
 
-        for calculation in self.history:
-            history_data.append({
-                "operation": calculation.operation,
-                "operand1": calculation.operand1,
-                "operand2": calculation.operand2,
-                "result": calculation.result,
-                "timestamp": calculation.timestamp.isoformat()
-            })
+            columns = [
+                "operation", "operand1", "operand2",
+                "result", "timestamp"
+            ]
 
-        columns = [
-            "operation", "operand1", "operand2",
-            "result", "timestamp"
-        ]
+            df = pd.DataFrame(history_data, columns=columns)
 
-        df = pd.DataFrame(history_data, columns=columns)
-
-        df.to_csv(
-            self.config.history_file,
-            index=False,
-            encoding=self.config.default_encoding
-        )
+            df.to_csv(
+                self.config.history_file,
+                index=False,
+                encoding=self.config.default_encoding
+            )
+        except Exception as error:
+            raise OperationError(
+                f"Failed to save history: {error}"
+            ) from error
 
     def load_history(self):
         """Load the calculation history from a CSV file using pandas."""
 
-        if not self.config.history_file.exists():
-            return
+        try:
+            if not self.config.history_file.exists():
+                return
 
-        df = pd.read_csv(
-            self.config.history_file,
-            encoding=self.config.default_encoding
-        )
-
-        self.history = []
-
-        for _, row in df.iterrows():
-            calculation = Calculation(
-                row["operation"],
-                float(row["operand1"]),
-                float(row["operand2"])
+            df = pd.read_csv(
+                self.config.history_file,
+                encoding=self.config.default_encoding
             )
 
-            calculation.timestamp = datetime.datetime.fromisoformat(
-                row["timestamp"]
-            )
+            self.history = []
 
-            self.history.append(calculation)
+            for _, row in df.iterrows():
+                calculation = Calculation(
+                    row["operation"],
+                    float(row["operand1"]),
+                    float(row["operand2"])
+                )
 
-        self.undo_stack.clear()
-        self.redo_stack.clear()
+                calculation.timestamp = datetime.datetime.fromisoformat(
+                    row["timestamp"]
+                )
+
+                self.history.append(calculation)
+
+            self.undo_stack.clear()
+            self.redo_stack.clear()
+        except Exception as error:
+            raise OperationError(
+                f"Failed to load history: {error}"
+            ) from error
 
     def undo(self):
         """Restore the history before the last calculation."""
