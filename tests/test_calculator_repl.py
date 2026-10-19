@@ -213,3 +213,25 @@ def test_repl_load_error(monkeypatch, capsys):
         calculator_repl()
     output = capsys.readouterr().out
     assert "Error loading history: Cannot load file" in output
+
+def test_repl_keyboard_interrupt(monkeypatch, capsys):
+    """Test handling Ctrl+C during REPL input."""
+
+    def interrupt_input(_):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr("builtins.input", interrupt_input)
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Calculator interrupted. Goodbye!" in output
+
+def test_repl_eof_error(monkeypatch, capsys):
+    """Test handling Ctrl+D during REPL input."""
+
+    def eof_input(_):
+        raise EOFError
+
+    monkeypatch.setattr("builtins.input", eof_input)
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Input terminated. Goodbye!" in output
