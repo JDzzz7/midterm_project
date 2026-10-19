@@ -161,3 +161,55 @@ def test_repl_division_by_zero(monkeypatch, capsys):
     calculator_repl()
     output = capsys.readouterr().out
     assert "Error:" in output
+
+def test_repl_save_success(monkeypatch, capsys):
+    """Test saving history through the REPL."""
+    inputs = iter(["save", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    with patch("app.calculator_repl.Calculator") as mock_calculator:
+        calculator_repl()
+
+        assert mock_calculator.return_value.save_history.call_count == 2
+    output = capsys.readouterr().out
+    assert "History saved successfully." in output
+
+def test_repl_save_error(monkeypatch, capsys):
+    """Test handling a save error."""
+    inputs = iter(["save", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    with patch("app.calculator_repl.Calculator") as mock_calculator:
+        mock_calculator.return_value.save_history.side_effect = OSError(
+            "Cannot save file"
+        )
+
+        calculator_repl()
+    output = capsys.readouterr().out
+    assert "Error saving history: Cannot save file" in output
+
+def test_repl_load_success(monkeypatch, capsys):
+    """Test loading history through the REPL."""
+    inputs = iter(["load", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    with patch("app.calculator_repl.Calculator") as mock_calculator:
+        calculator_repl()
+
+        mock_calculator.return_value.load_history.assert_called_once()
+    output = capsys.readouterr().out
+    assert "History loaded successfully." in output
+
+def test_repl_load_error(monkeypatch, capsys):
+    """Test handling a load error."""
+    inputs = iter(["load", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    with patch("app.calculator_repl.Calculator") as mock_calculator:
+        mock_calculator.return_value.load_history.side_effect = OSError(
+            "Cannot load file"
+        )
+
+        calculator_repl()
+    output = capsys.readouterr().out
+    assert "Error loading history: Cannot load file" in output
