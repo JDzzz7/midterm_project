@@ -198,3 +198,54 @@ class Calculator:
 
         return True
 
+def test_calculator_multiple_redo(calculator):
+    """Test redoing multiple undone calculations."""
+    calculator.perform_operation("add", 2.0, 3.0)
+    calculator.perform_operation("multiply", 4.0, 5.0)
+
+    calculator.undo()
+    calculator.undo()
+
+    assert calculator.history == []
+
+    calculator.redo()
+    assert len(calculator.history) == 1
+    assert calculator.history[0].result == 5.0
+
+    calculator.redo()
+    assert len(calculator.history) == 2
+    assert calculator.history[1].result == 20.0
+
+def test_calculator_clear_history_after_undo(calculator):
+    """Test clearing history after an undo operation."""
+    calculator.perform_operation("add", 2.0, 3.0)
+    calculator.perform_operation("multiply", 4.0, 5.0)
+
+    calculator.undo()
+    calculator.clear_history()
+
+    assert calculator.history == []
+    assert calculator.undo_stack == []
+    assert calculator.redo_stack == []
+
+def test_calculator_history_preserves_order(calculator):
+    """Test that calculations remain in the correct order."""
+    calculator.perform_operation("add", 1.0, 2.0)
+    calculator.perform_operation("subtract", 10.0, 4.0)
+    calculator.perform_operation("multiply", 3.0, 5.0)
+
+    assert len(calculator.history) == 3
+    assert [calc.operation for calc in calculator.history] == [
+        "add",
+        "subtract",
+        "multiply"
+    ]
+
+def test_calculator_numeric_string_inputs(calculator):
+    """Test that valid numeric strings are accepted."""
+    result = calculator.perform_operation("add", "2.5", "3.5")
+
+    assert result == 6.0
+    assert len(calculator.history) == 1
+    assert calculator.history[0].operand1 == 2.5
+    assert calculator.history[0].operand2 == 3.5
