@@ -374,3 +374,33 @@ def test_calculator_load_history_invalid_operation(calculator):
                 calculator.load_history()
 
     assert calculator.history == []   
+
+def test_calculator_get_history_dataframe(calculator):
+    """Test converting calculation history into a DataFrame."""
+    calculator.perform_operation("add", 2.0, 3.0)
+    df = calculator.get_history_dataframe()
+
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) == 1
+    assert df.iloc[0]["operation"] == "add"
+    assert float(df.iloc[0]["operand1"]) == 2.0
+    assert float(df.iloc[0]["operand2"]) == 3.0
+    assert float(df.iloc[0]["result"]) == 5.0
+
+def test_calculator_get_history_dataframe_multiple(calculator):
+    """Test DataFrame containing multiple calculations."""
+    calculator.perform_operation("add", 2.0, 3.0)
+    calculator.perform_operation("multiply", 4.0, 5.0)
+    df = calculator.get_history_dataframe()
+
+    assert len(df) == 2
+    assert list(df["operation"]) == ["add", "multiply"]
+    assert float(df.iloc[0]["result"]) == 5.0
+    assert float(df.iloc[1]["result"]) == 20.0
+
+def test_calculator_get_history_dataframe_empty(calculator):
+    """Test converting empty history into a DataFrame."""
+    df = calculator.get_history_dataframe()
+
+    assert isinstance(df, pd.DataFrame)
+    assert df.empty
