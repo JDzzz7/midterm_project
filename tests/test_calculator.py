@@ -1,5 +1,6 @@
 import pytest
-
+import datetime
+import pandas as pd
 from pathlib import Path
 from unittest.mock import patch, PropertyMock
 from app.calculator import Calculator
@@ -279,3 +280,53 @@ def test_calculator_max_history_size(calculator):
     assert len(calculator.history) == 2
     assert calculator.history[0].result == 7.0
     assert calculator.history[1].result == 11.0
+
+def test_calculator_save_history(calculator):
+    """Test saving calculation history to CSV."""
+    calculator.perform_operation("add", 2.0, 3.0)
+
+    with patch("app.calculator.pd.DataFrame.to_csv") as mock_to_csv:
+        calculator.save_history()
+
+        mock_to_csv.assert_called_once()
+
+def test_calculator_save_empty_history(calculator):
+    """Test saving an empty calculation history."""
+    with patch("app.calculator.pd.DataFrame.to_csv") as mock_to_csv:
+        calculator.save_history()
+
+        mock_to_csv.assert_called_once()
+
+def test_calculator_load_history(calculator):
+    """Test loading calculation history from CSV."""
+    timestamp = datetime.datetime.now().isoformat()
+
+    data = pd.DataFrame({
+        "operation": ["add"],
+        "operand1": ["2.0"],
+        "operand2": ["3.0"],
+        "result": ["5.0"],
+        "timestamp": [timestamp]
+    })
+
+    with patch("app.calculator.pd.read_csv", return_value=data):
+        with patch.object(Path, "exists", return_value=True):
+            calculator.load_history()
+
+    assert len(calculator.history) == 1
+    assert calculator.history[0].operation == "add"
+    assert calculator.history[0].operand1 == 2.0
+    assert calculator.history[0].operand2 == 3.0
+    assert calculator.history[0].result == 5.0
+
+def test_calculator_load_empty_history(calculator):
+    """Test loading an empty CSV file."""
+    with patch(
+        "app.calculator.pd.read_csv",
+        return_value=pd.DataFrame()
+    ):
+        with patch.object(Path, "exists", return_value=True):
+            calculator.load_history()
+
+    assert calculator.history == []
+    
