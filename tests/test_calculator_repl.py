@@ -125,3 +125,39 @@ def test_repl_redo_success(monkeypatch, capsys):
     calculator_repl()
     output = capsys.readouterr().out
     assert "Operation redone." in output
+
+def test_repl_cancel_first_number(monkeypatch, capsys):
+    """Test cancelling at the first number."""
+    inputs = iter(["add", "cancel", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Operation cancelled." in output
+
+def test_repl_cancel_second_number(monkeypatch, capsys):
+    """Test cancelling at the second number."""
+    inputs = iter(["add", "2", "cancel", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Operation cancelled." in output
+
+def test_repl_invalid_operand(monkeypatch, capsys):
+    """Test invalid numeric input."""
+    inputs = iter(["add", "abc", "3", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Error:" in output
+
+def test_repl_division_by_zero(monkeypatch, capsys):
+    """Test division by zero."""
+    inputs = iter(["divide", "10", "0", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+
+    calculator_repl()
+    output = capsys.readouterr().out
+    assert "Error:" in output
