@@ -5,6 +5,7 @@ from unittest.mock import patch, PropertyMock
 from app.calculator import Calculator
 from app.calculator_config import CalculatorConfig
 from app.exceptions import OperationError, ValidationError
+from app.history import LoggingObserver
 
 @pytest.fixture
 def calculator(tmp_path):
@@ -136,4 +137,40 @@ def test_calculator_error_does_not_change_history(calculator):
     assert calculator.history == []
     assert calculator.undo_stack == []
     assert calculator.redo_stack == []
-    
+
+def test_add_observer(calculator):
+    """Test adding an observer to the calculator."""
+    observer = LoggingObserver()
+
+    calculator.add_observer(observer)
+
+    assert observer in calculator.observers
+
+def test_remove_observer(calculator):
+    """Test removing an observer from the calculator."""
+    observer = LoggingObserver()
+
+    calculator.add_observer(observer)
+    calculator.remove_observer(observer)
+
+    assert observer not in calculator.observers
+
+def test_calculator_default_observers(calculator):
+    """Test that the calculator initializes with two observers."""
+    assert len(calculator.observers) == 2
+
+def test_notify_observers(calculator):
+    """Test that observers are notified after a calculation."""
+    from unittest.mock import Mock
+
+    observer = Mock()
+    calculator.add_observer(observer)
+
+    calculator.perform_operation("add", 2.0, 3.0)
+
+    observer.update.assert_called_once()
+
+    calculation = observer.update.call_args.args[0]
+
+    assert calculation.operation == "add"
+    assert calculation.result == 5.0
