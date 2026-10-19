@@ -322,3 +322,23 @@ class TestOperation:
         operation = Addition()
 
         assert str(operation) == "Addition"    
+
+def test_abstract_execute():
+    """Test the abstract execute method through a subclass."""
+
+    class TestOperation(Operation):
+        def execute(self, a, b):
+            return super().execute(a, b)
+
+    operation = TestOperation()
+    assert operation.execute(2, 3) is None
+
+def test_validate_operands_success():
+    """Test successful operand validation."""
+
+    class TestOperation(Operation):
+        def execute(self, a, b):
+            return a + b
+
+    operation = TestOperation()
+    assert operation.validate_operands(2, 3) is None
