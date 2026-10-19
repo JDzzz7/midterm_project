@@ -73,9 +73,9 @@ class Calculator:
         return [str(calculation) for calculation in self.history]
 
     def clear_history(self):
-        """Clear calculation history."""
-        self.undo_stack.append(CalculatorMemento(self.history))
+        """Clear calculation history and reset undo/redo stacks."""
         self.history.clear()
+        self.undo_stack.clear()
         self.redo_stack.clear()
 
     def save_history(self):
