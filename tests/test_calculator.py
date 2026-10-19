@@ -174,3 +174,65 @@ def test_notify_observers(calculator):
 
     assert calculation.operation == "add"
     assert calculation.result == 5.0
+
+def test_calculator_undo(calculator):
+    """Test undoing a calculation."""
+    calculator.perform_operation("add", 2.0, 3.0)
+
+    result = calculator.undo()
+
+    assert result is True
+    assert calculator.history == []
+
+def test_calculator_redo(calculator):
+    """Test redoing an undone calculation."""
+    calculator.perform_operation("add", 2.0, 3.0)
+
+    calculator.undo()
+    result = calculator.redo()
+
+    assert result is True
+    assert len(calculator.history) == 1
+    assert calculator.history[0].result == 5.0
+
+def test_calculator_undo_empty(calculator):
+    """Test undo when there is nothing to undo."""
+    result = calculator.undo()
+
+    assert result is False
+    assert calculator.history == []
+
+def test_calculator_redo_empty(calculator):
+    """Test redo when there is nothing to redo."""
+    result = calculator.redo()
+
+    assert result is False
+    assert calculator.history == []
+
+def test_calculator_multiple_undo(calculator):
+    """Test undoing multiple calculations."""
+    calculator.perform_operation("add", 2.0, 3.0)
+    calculator.perform_operation("multiply", 4.0, 5.0)
+
+    assert len(calculator.history) == 2
+
+    calculator.undo()
+    assert len(calculator.history) == 1
+    assert calculator.history[0].result == 5.0
+
+    calculator.undo()
+    assert calculator.history == []
+
+def test_calculator_new_operation_clears_redo(calculator):
+    """Test that a new calculation clears the redo stack."""
+    calculator.perform_operation("add", 2.0, 3.0)
+
+    calculator.undo()
+    assert len(calculator.redo_stack) == 1
+
+    calculator.perform_operation("multiply", 4.0, 5.0)
+
+    assert calculator.redo_stack == []
+    assert len(calculator.history) == 1
+    assert calculator.history[0].result == 20.0
+    
