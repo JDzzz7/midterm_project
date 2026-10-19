@@ -329,4 +329,48 @@ def test_calculator_load_empty_history(calculator):
             calculator.load_history()
 
     assert calculator.history == []
-    
+
+def test_calculator_load_history_file_not_found(calculator):
+    """Test loading history when the file does not exist."""
+    with patch.object(Path, "exists", return_value=False):
+        calculator.load_history()
+
+    assert calculator.history == []
+
+def test_calculator_save_history_failure(calculator):
+    """Test handling an error while saving history."""
+    calculator.perform_operation("add", 2.0, 3.0)
+
+    with patch(
+        "app.calculator.pd.DataFrame.to_csv",
+        side_effect=Exception("save failed")
+    ):
+        with pytest.raises(OperationError, match="Failed to save history"):
+            calculator.save_history()
+
+def test_calculator_load_history_failure(calculator):
+    """Test handling an error while loading history."""
+    with patch.object(Path, "exists", return_value=True):
+        with patch(
+            "app.calculator.pd.read_csv",
+            side_effect=Exception("read failed")
+        ):
+            with pytest.raises(OperationError, match="Failed to load history"):
+                calculator.load_history()
+
+def test_calculator_load_history_invalid_operation(calculator):
+    """Test loading history containing an unsupported operation."""
+    data = pd.DataFrame({
+        "operation": ["unknown"],
+        "operand1": ["2.0"],
+        "operand2": ["3.0"],
+        "result": ["5.0"],
+        "timestamp": [datetime.datetime.now().isoformat()]
+    })
+
+    with patch.object(Path, "exists", return_value=True):
+        with patch("app.calculator.pd.read_csv", return_value=data):
+            with pytest.raises(OperationError):
+                calculator.load_history()
+
+    assert calculator.history == []   
